@@ -1,0 +1,17 @@
+{
+	"name": "mentoring-adf-jo",
+	"properties": {
+		"globalParameters": {
+			"LogicAppWebhookUrl": {
+				"type": "string",
+				"value": "https://mentoring-key-vault-jo2.vault.azure.net/secrets/module11HTTP?api-version=7.5"
+			}
+		}
+	},
+	"location": "francecentral",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "04c6101f-3428-455d-b022-b838afb2c69b",
+		"tenantId": "b41b72d0-4e9f-4c26-8a69-f949f367c91d"
+	}
+}

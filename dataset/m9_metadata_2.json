@@ -1,0 +1,65 @@
+{
+	"name": "m9_metadata_2",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MoviesAzSqlDatabaseLS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "ID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "SourceContainer",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceFolder",
+				"type": "nvarchar"
+			},
+			{
+				"name": "SourceFileName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ColumnDelimiter",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FirstRowAsHeader",
+				"type": "bit"
+			},
+			{
+				"name": "DestinationSchema",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DestinationTable",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DIUValue",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "IsActive",
+				"type": "bit"
+			},
+			{
+				"name": "ProcessingOrder",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "etl",
+			"table": "tControlMetadata3"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,296 @@
+{
+	"name": "module9_MetadataDrivenCopy",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetMetadata",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT Id, SourceContainer, SourceFolder, SourceFile, ColumnDelimiter, EscapeChar, QuoteChar, SchemaName, TableName, DIU, ColumnMapping FROM [etl].[tControlMetadata]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "module9_metadata",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEachFile",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetMetadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetMetadata').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "CopyCSVToSql",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"additionalColumns": [
+										{
+											"name": "source_filename",
+											"value": "$$FILEPATH"
+										},
+										{
+											"name": "pipelineId",
+											"value": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											}
+										}
+									],
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"wildcardFileName": {
+											"value": "@{item().SourceFile}",
+											"type": "Expression"
+										},
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "TRUNCATE TABLE [@{item().SchemaName}].[@{item().TableName}]",
+										"type": "Expression"
+									},
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"dataIntegrationUnits": {
+									"value": "@int(item().DIU)",
+									"type": "Expression"
+								},
+								"translator": {
+									"value": "@json(item().ColumnMapping)",
+									"type": "Expression"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "module9_sourceCSV",
+									"type": "DatasetReference",
+									"parameters": {
+										"delimiter": {
+											"value": "@{item().ColumnDelimiter}",
+											"type": "Expression"
+										},
+										"escape": {
+											"value": "@{item().EscapeChar}",
+											"type": "Expression"
+										},
+										"quote": "\""
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "module9_sink",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": {
+											"value": "@{item().SchemaName}",
+											"type": "Expression"
+										},
+										"table": {
+											"value": "@{item().TableName}",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "LogCopyActivity",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "CopyCSVToSql",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[usp_InsertCopyActivityLog]",
+								"storedProcedureParameters": {
+									"ActivityName": {
+										"value": "CopyCSVToSql",
+										"type": "String"
+									},
+									"BillingDuration": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.billingReference.billableDuration[0].duration",
+											"type": "Expression"
+										},
+										"type": "Decimal"
+									},
+									"CopyDuration": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.copyDuration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"DIU": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.usedDataIntegrationUnits",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"EndTime": {
+										"value": {
+											"value": "@formatDateTime(addSeconds(formatDateTime(activity('CopyCSVToSql').output.executionDetails[0].start, 'yyyy-MM-ddTHH:mm:ss'), activity('CopyCSVToSql').output.copyDuration), 'yyyy-MM-dd HH:mm:ss')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"MeterType": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.billingReference.billableDuration[0].meterType",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ParallelCopies": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.usedParallelCopies",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"PipelineName": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineRunId": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ProcessedFiles": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.filesRead",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"QueueDuration": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.executionDetails[0].detailedDurations.queuingDuration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"RowsRead": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.rowsRead",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"RowsWritten": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.rowsCopied",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"StartTime": {
+										"value": {
+											"value": "@formatDateTime(activity('CopyCSVToSql').output.executionDetails[0].start, 'yyyy-MM-dd HH:mm:ss')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"Status": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.executionDetails[0].status",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"TransferDuration": {
+										"value": {
+											"value": "@activity('CopyCSVToSql').output.executionDetails[0].detailedDurations.transferDuration",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "MoviesAzSqlDatabaseLS",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"CurrentFile": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-06-04T23:51:17Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

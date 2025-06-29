@@ -1,0 +1,33 @@
+{
+	"name": "module9_sink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MoviesAzSqlDatabaseLS",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"schema": {
+				"type": "string",
+				"defaultValue": "stg"
+			},
+			"table": {
+				"type": "string",
+				"defaultValue": "movies_metadata"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@{dataset().schema}",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@{dataset().table}",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

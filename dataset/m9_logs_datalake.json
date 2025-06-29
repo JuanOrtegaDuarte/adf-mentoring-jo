@@ -1,0 +1,27 @@
+{
+	"name": "m9_logs_datalake",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorageDataLake",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "log_@{pipeline().RunId}_@{formatDateTime(utcNow(), 'yyyyMMddHHmmss')}.json",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "copyactivity/@{formatDateTime(utcNow(), 'yyyy')}/@{formatDateTime(utcNow(), 'MM')}/@{formatDateTime(utcNow(), 'dd')}",
+					"type": "Expression"
+				},
+				"container": "log"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

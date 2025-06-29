@@ -1,0 +1,72 @@
+{
+	"name": "pl_module7_master",
+	"properties": {
+		"activities": [
+			{
+				"name": "IncrementalCopyOnline",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_module7_IncrementalCopyOnlineFiles",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Copy to SQL",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "IncrementalCopyOnline",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_module7_copytosql",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "Delete and archive",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Copy to SQL",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_module7_delete_and_archive",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-05-13T00:33:55Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
