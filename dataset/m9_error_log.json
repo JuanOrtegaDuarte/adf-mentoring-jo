@@ -1,0 +1,59 @@
+{
+	"name": "m9_error_log",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "MoviesAzSqlDatabaseLS",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "ErrorLogId",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PipelineName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "PipelineRunId",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ActivityName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ErrorCode",
+				"type": "nvarchar"
+			},
+			{
+				"name": "FailureType",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ErrorMessage",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ErrorDateTime",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "CreatedDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "etl",
+			"table": "tPipelineErrorLog"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

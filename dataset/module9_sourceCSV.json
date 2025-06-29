@@ -1,0 +1,60 @@
+{
+	"name": "module9_sourceCSV",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorageDataLake",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"delimiter": {
+				"type": "string",
+				"defaultValue": ","
+			},
+			"escape": {
+				"type": "string",
+				"defaultValue": "\""
+			},
+			"quote": {
+				"type": "string",
+				"defaultValue": "\""
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"folderPath": "metadata-driven",
+				"container": "raw"
+			},
+			"columnDelimiter": {
+				"value": "@dataset().delimiter",
+				"type": "Expression"
+			},
+			"escapeChar": {
+				"value": "@dataset().escape",
+				"type": "Expression"
+			},
+			"firstRowAsHeader": true,
+			"quoteChar": {
+				"value": "@dataset().quote",
+				"type": "Expression"
+			}
+		},
+		"schema": [
+			{
+				"name": "cast",
+				"type": "String"
+			},
+			{
+				"name": "crew",
+				"type": "String"
+			},
+			{
+				"name": "id",
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

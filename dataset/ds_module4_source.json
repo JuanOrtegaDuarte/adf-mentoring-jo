@@ -1,0 +1,19 @@
+{
+	"name": "ds_module4_source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage_AU",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "ratings.zip",
+				"container": "ratings"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

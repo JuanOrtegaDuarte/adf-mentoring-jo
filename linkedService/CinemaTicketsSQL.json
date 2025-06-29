@@ -1,0 +1,22 @@
+{
+	"name": "CinemaTicketsSQL",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "AzureKeyVault1",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "CinemaTicketsConnectionString"
+			}
+		},
+		"connectVia": {
+			"referenceName": "module6IntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

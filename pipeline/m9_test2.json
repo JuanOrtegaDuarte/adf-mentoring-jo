@@ -1,0 +1,142 @@
+{
+	"name": "m9_test2",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get_File_Metadata",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT \n    SourceContainer,\n    SourceFolder,\n    SourceFileName,\n    ColumnDelimiter,\n    FirstRowAsHeader,\n    DestinationSchema,\n    DestinationTable,\n    DIUValue,\n    ColumnMapping,\n    ProcessingOrder\nFROM [etl].[tControlMetadata3]\nWHERE IsActive = 1\nAND DestinationTable = 'ratings'\nORDER BY ProcessingOrder;\n",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "m9_metadata_2",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach_File",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get_File_Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get_File_Metadata').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy_CSV_to_SQL",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "TRUNCATE TABLE [@{item().DestinationSchema}].[@{item().DestinationTable}]\n\n",
+										"type": "Expression"
+									},
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"dataIntegrationUnits": {
+									"value": "@item().DIUValue",
+									"type": "Expression"
+								},
+								"translator": {
+									"value": "@json(replace(item().ColumnMapping, '\\', ''))",
+									"type": "Expression"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "m9_csv_source",
+									"type": "DatasetReference",
+									"parameters": {
+										"Container": {
+											"value": "@item().SourceContainer",
+											"type": "Expression"
+										},
+										"Directory": {
+											"value": "@item().SourceFolder",
+											"type": "Expression"
+										},
+										"Filename": {
+											"value": "@item().SourceFileName",
+											"type": "Expression"
+										},
+										"Delimiter": {
+											"value": "@item().ColumnDelimiter",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "m9_sql_sink",
+									"type": "DatasetReference",
+									"parameters": {
+										"SchemaName": {
+											"value": "@item().DestinationSchema",
+											"type": "Expression"
+										},
+										"TableName": {
+											"value": "@item().DestinationTable",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2025-06-03T01:26:42Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
