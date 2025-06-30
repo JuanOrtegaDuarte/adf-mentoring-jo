@@ -1,0 +1,6 @@
+{
+	"LogicAppWebhookUrl": {
+		"type": "string",
+		"value": "https://mentoring-key-vault-jo2.vault.azure.net/secrets/module11HTTP?api-version=7.5"
+	}
+}

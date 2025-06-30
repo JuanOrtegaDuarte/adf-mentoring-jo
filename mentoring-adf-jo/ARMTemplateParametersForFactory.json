@@ -1,0 +1,51 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "mentoring-adf-jo"
+		},
+		"AzureBlobStorage_AU_connectionString": {
+			"value": ""
+		},
+		"MoviesAzSqlDatabaseLS_password": {
+			"value": ""
+		},
+		"AzureBlobStorage1_properties_typeProperties_sasUri_secretName": {
+			"value": "blobsasurl"
+		},
+		"AzureBlobStorageDataLake_properties_typeProperties_serviceEndpoint": {
+			"value": "https://azurementoringdatalakejo.blob.core.windows.net/"
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"value": "https://mentoring-key-vault-jo2.vault.azure.net/"
+		},
+		"CinemaTicketsSQL_properties_typeProperties_connectionString_secretName": {
+			"value": "CinemaTicketsConnectionString"
+		},
+		"DataMartSQLDataBase_properties_typeProperties_connectionString_secretName": {
+			"value": "DataMartSQL"
+		},
+		"MoviesAzSqlDatabaseLS_properties_typeProperties_server": {
+			"value": "azure-mentoring-jo.database.windows.net"
+		},
+		"MoviesAzSqlDatabaseLS_properties_typeProperties_database": {
+			"value": "movies"
+		},
+		"MoviesAzSqlDatabaseLS_properties_typeProperties_userName": {
+			"value": "juan_ortega"
+		},
+		"MoviesAzSqlDatabaseLS2_properties_typeProperties_server": {
+			"value": "azure-mentoring-jo.database.windows.net"
+		},
+		"MoviesAzSqlDatabaseLS2_properties_typeProperties_database": {
+			"value": "movies"
+		},
+		"MoviesAzSqlDatabaseLS2_properties_typeProperties_userName": {
+			"value": "etl"
+		},
+		"OnlineBlobModule7LS_properties_typeProperties_sasUri_secretName": {
+			"value": "Module7OnlineContainer"
+		}
+	}
+}
